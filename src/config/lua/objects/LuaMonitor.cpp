@@ -5,6 +5,8 @@
 #include "../../../helpers/Monitor.hpp"
 #include "../../../desktop/state/FocusState.hpp"
 
+#include <lua.h>
+#include <print>
 #include <string_view>
 
 using namespace Config::Lua;
@@ -30,6 +32,16 @@ static int monitorToString(lua_State* L) {
         lua_pushfstring(L, "HL.Monitor(%d:%s)", mon->m_id, mon->m_name.c_str());
 
     return 1;
+}
+
+static std::vector<std::string> availableModesForOutputV(PHLMONITOR pMonitor) {
+    std::vector<std::string> result;
+
+    for (auto const& m : pMonitor->m_output->modes) {
+            result.push_back(std::format("{}x{}@{:.2f}Hz ", m->pixelSize.x, m->pixelSize.y, m->refreshRate / 1000.0));
+    }
+
+    return result;
 }
 
 static int monitorIndex(lua_State* L) {
@@ -121,6 +133,16 @@ static int monitorIndex(lua_State* L) {
         lua_setfield(L, -2, "bottom");
         lua_pushnumber(L, mon->m_reservedArea.left());
         lua_setfield(L, -2, "left");
+    } else if (key == "modes") {
+        std::vector<std::string> modes = availableModesForOutputV(mon);
+        // std::println("modes: {}", modes);
+        lua_newtable(L);
+        int i = 1;
+        for (std::string_view mode : modes) {
+            lua_pushlstring(L, mode.data(), mode.length());
+            lua_rawseti(L, -2, i++);
+        }
+        
     } else
         lua_pushnil(L);
 
