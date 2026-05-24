@@ -5,8 +5,6 @@
 #include "../../../helpers/Monitor.hpp"
 #include "../../../desktop/state/FocusState.hpp"
 
-#include <lua.h>
-#include <print>
 #include <string_view>
 
 using namespace Config::Lua;
