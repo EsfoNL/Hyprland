@@ -38,7 +38,7 @@ static std::vector<std::string> availableModesForOutputV(PHLMONITOR pMonitor) {
     std::vector<std::string> result;
 
     for (auto const& m : pMonitor->m_output->modes) {
-            result.push_back(std::format("{}x{}@{:.2f}Hz ", m->pixelSize.x, m->pixelSize.y, m->refreshRate / 1000.0));
+        result.push_back(std::format("{}x{}@{:.2f}Hz ", m->pixelSize.x, m->pixelSize.y, m->refreshRate / 1000.0));
     }
 
     return result;
@@ -142,7 +142,7 @@ static int monitorIndex(lua_State* L) {
             lua_pushlstring(L, mode.data(), mode.length());
             lua_rawseti(L, -2, i++);
         }
-        
+
     } else
         lua_pushnil(L);
 
