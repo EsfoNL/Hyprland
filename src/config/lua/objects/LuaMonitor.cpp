@@ -32,14 +32,15 @@ static int monitorToString(lua_State* L) {
     return 1;
 }
 
-static std::vector<std::string> availableModesForOutputV(PHLMONITOR pMonitor) {
-    std::vector<std::string> result;
+static void pushModes(lua_State* L, PHLMONITOR pMonitor) {
+    lua_newtable(L);
+    int i = 1;
 
     for (auto const& m : pMonitor->m_output->modes) {
-        result.push_back(std::format("{}x{}@{:.2f}Hz ", m->pixelSize.x, m->pixelSize.y, m->refreshRate / 1000.0));
+        std::string mode = std::format("{}x{}@{:.2f}Hz ", m->pixelSize.x, m->pixelSize.y, m->refreshRate / 1000.0);
+        lua_pushlstring(L, mode.data(), mode.length());
+        lua_rawseti(L, -2, i++);
     }
-
-    return result;
 }
 
 static int monitorIndex(lua_State* L) {
@@ -132,15 +133,7 @@ static int monitorIndex(lua_State* L) {
         lua_pushnumber(L, mon->m_reservedArea.left());
         lua_setfield(L, -2, "left");
     } else if (key == "modes") {
-        std::vector<std::string> modes = availableModesForOutputV(mon);
-        // std::println("modes: {}", modes);
-        lua_newtable(L);
-        int i = 1;
-        for (std::string_view mode : modes) {
-            lua_pushlstring(L, mode.data(), mode.length());
-            lua_rawseti(L, -2, i++);
-        }
-
+        pushModes(L, mon);
     } else
         lua_pushnil(L);
 
